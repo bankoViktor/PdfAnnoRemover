@@ -366,7 +366,10 @@ namespace PdfAnnoRemover.ViewModels
 
             if (!_cts.IsCancellationRequested)
             {
-                System.Windows.MessageBox.Show(App.Current.MainWindow, "Completed", App.Current.MainWindow.Title, MessageBoxButton.OK, MessageBoxImage.Information);
+                var fielsCount = Files?.Count ?? 0;
+                var totalRemoved = Files?.Sum(x => x.RemovedCount) ?? 0;
+                var message = $"Successfully removed {totalRemoved} annotation items from {fielsCount} files.";
+                System.Windows.MessageBox.Show(App.Current.MainWindow, message, App.Current.MainWindow.Title, MessageBoxButton.OK, MessageBoxImage.Information);
             }
 
             _cts = null;

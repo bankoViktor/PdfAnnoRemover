@@ -3,7 +3,8 @@
 ## [0.0.0.0](https://github.com/bankoViktor/PdfAnnoRemover/releases/tag/0.0.0.0) (YYYY-MM-DD)
 
 ### Improvements
-- - Added user friendly error message for password protected PDF file error.
+- Added user friendly error message for password protected PDF file error.
+- Added result statistic to success completed message.
 
 ### Bug Fixes
 - Fixed remove temporary file when error occurred.
