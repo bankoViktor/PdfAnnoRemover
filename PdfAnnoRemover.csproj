@@ -10,6 +10,13 @@
     <Copyright>Banko Viktor S. (bankviktor14@gmail.com)</Copyright>
     <Authors>Banko Viktor S.</Authors>
     <Description>Removes third party annotation items from PDF files</Description>
+    <Version>$(VersionPrefix)</Version>
+    <SignAssembly>False</SignAssembly>
+    <PackageProjectUrl>https://github.com/bankoViktor/PdfAnnoRemover</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/bankoViktor/PdfAnnoRemover</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <AssemblyVersion>1.0.1</AssemblyVersion>
+    <FileVersion>1.0.1</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>
