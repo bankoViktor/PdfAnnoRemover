@@ -51,7 +51,7 @@ namespace PdfAnnoRemover
                 pdfDoc.Close();
 
                 File.Delete(inputPath);
-                File.Move(inputPath + ".tmp", inputPath);
+                File.Move(tempFilename, inputPath);
             }
             catch (BadPasswordException pwExc)
             {
