@@ -53,6 +53,10 @@ namespace PdfAnnoRemover
                 File.Delete(inputPath);
                 File.Move(inputPath + ".tmp", inputPath);
             }
+            catch (BadPasswordException pwExc)
+            {
+                throw new Exception("Password protected", pwExc);
+            }
             catch (Exception)
             {
                 throw;
