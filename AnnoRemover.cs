@@ -1,5 +1,7 @@
 ﻿using System.IO;
+using iText.Kernel.Exceptions;
 using iText.Kernel.Pdf;
+using iText.Kernel.Pdf.Annot;
 
 namespace PdfAnnoRemover
 {
@@ -8,45 +10,60 @@ namespace PdfAnnoRemover
         public const string AutoCadAuthorName = "AutoCAD SHX Text";
         public const string NullAuthorName = "NULL";
 
+        private static string GetAuthorKey(PdfAnnotation anno) => anno.GetPdfObject()?.GetAsString(PdfName.T)?.ToUnicodeString() ?? NullAuthorName;
 
         public static int? RemoveDrawingsFromPDF(string inputPath, CancellationToken cancellationToken)
         {
             var removedCount = 0;
+            var tempFilename = inputPath + ".tmp";
 
-            using var reader = new PdfReader(inputPath);
-            using var writer = new PdfWriter(inputPath + ".tmp");
-            using var pdfDoc = new PdfDocument(reader, writer);
-
-            var pageCount = pdfDoc.GetNumberOfPages();
-            for (var pageIndex = 1; pageIndex <= pageCount; pageIndex++)
+            try
             {
-                var page = pdfDoc.GetPage(pageIndex);
+                using var reader = new PdfReader(inputPath);
+                using var writer = new PdfWriter(tempFilename);
+                using var pdfDoc = new PdfDocument(reader, writer);
 
-                var pageAnnotations = page.GetAnnotations();
-                var groupedByAuthors = pageAnnotations
-                    .GroupBy(x => x.GetPdfObject()?.GetAsString(PdfName.T)?.ToUnicodeString() ?? NullAuthorName);
-                foreach (var group in groupedByAuthors)
+                var pageCount = pdfDoc.GetNumberOfPages();
+                for (var pageIndex = 1; pageIndex <= pageCount; pageIndex++)
                 {
-                    if (cancellationToken.IsCancellationRequested) return null;
+                    var page = pdfDoc.GetPage(pageIndex);
 
-                    if (group.Key == AutoCadAuthorName ||
-                        group.Key == NullAuthorName)
+                    var pageAnnotations = page.GetAnnotations();
+                    var groupedByAuthors = pageAnnotations.GroupBy(GetAuthorKey);
+                    foreach (var group in groupedByAuthors)
                     {
-                        continue;
-                    }
+                        if (cancellationToken.IsCancellationRequested) return null;
 
-                    foreach (var groupAnno in group)
-                    {
-                        page.RemoveAnnotation(groupAnno);
-                        removedCount++;
+                        if (group.Key == AutoCadAuthorName ||
+                            group.Key == NullAuthorName)
+                        {
+                            continue;
+                        }
+
+                        foreach (var groupAnno in group)
+                        {
+                            page.RemoveAnnotation(groupAnno);
+                            removedCount++;
+                        }
                     }
                 }
+
+                pdfDoc.Close();
+
+                File.Delete(inputPath);
+                File.Move(inputPath + ".tmp", inputPath);
             }
-
-            pdfDoc.Close();
-
-            File.Delete(inputPath);
-            File.Move(inputPath + ".tmp", inputPath);
+            catch (Exception)
+            {
+                throw;
+            }
+            finally
+            {
+                if (File.Exists(tempFilename))
+                {
+                    File.Delete(tempFilename);
+                }
+            }
 
             return removedCount;
         }
